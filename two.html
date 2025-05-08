@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <title>हिंदी अनुच्छेद सारांश</title>
+  <style>
+    body {
+      font-family: 'Noto Sans Devanagari', sans-serif;
+      background-color: #fefefe;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 960px;
+      width: 90%;
+      padding: 30px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      font-size: 16px;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      padding: 10px 18px;
+      font-size: 15px;
+      background-color: #16a085;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #13856e;
+    }
+    #output {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f4f4f4;
+      min-height: 100px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>हिंदी अनुच्छेद सारांश</h2>
+    <textarea id="inputText" placeholder="यहाँ हिंदी अनुच्छेद पेस्ट करें..."></textarea>
+    <div class="buttons">
+      <button onclick="summarize()">सारांश निकालें</button>
+      <button onclick="copyOutput()">कॉपी करें</button>
+      <button onclick="clearInput()">इनपुट साफ करें</button>
+      <button onclick="clearOutput()">आउटपुट साफ करें</button>
+    </div>
+    <div id="output" placeholder="यहाँ सारांश दिखाई देगा..."></div>
+  </div>
+
+  <script>
+    function getWordFreq(text) {
+      const freq = {};
+      const words = text.replace(/[^\u0900-\u097F\s]/g, "").split(/\s+/);
+      for (const word of words) {
+        if (!freq[word]) freq[word] = 0;
+        freq[word]++;
+      }
+      return freq;
+    }
+
+    function scoreSentences(sentences, wordFreq) {
+      const scores = [];
+      for (const sentence of sentences) {
+        let score = 0;
+        const words = sentence.replace(/[^\u0900-\u097F\s]/g, "").split(/\s+/);
+        for (const word of words) {
+          if (wordFreq[word]) score += wordFreq[word];
+        }
+        scores.push({ sentence, score });
+      }
+      return scores;
+    }
+
+    function summarize() {
+      const text = document.getElementById("inputText").value.trim();
+      if (!text) {
+        document.getElementById("output").innerText = "कृपया अनुच्छेद डालें।";
+        return;
+      }
+
+      const sentences = text.match(/[^।!?]+[।!?]+/g) || [text];
+      const wordFreq = getWordFreq(text);
+      const scored = scoreSentences(sentences, wordFreq);
+      scored.sort((a, b) => b.score - a.score);
+
+      const topSentences = scored.slice(0, Math.ceil(sentences.length / 3));
+      const summary = topSentences.map(s => s.sentence.trim()).join(" ");
+      document.getElementById("output").innerText = summary;
+    }
+
+    function copyOutput() {
+      const summary = document.getElementById("output").innerText;
+      if (!summary) return;
+      navigator.clipboard.writeText(summary).then(() => {
+        alert("सारांश कॉपी हो गया!");
+      });
+    }
+
+    function clearInput() {
+      document.getElementById("inputText").value = "";
+    }
+
+    function clearOutput() {
+      document.getElementById("output").innerText = "";
+    }
+  </script>
+</body>
+</html>
