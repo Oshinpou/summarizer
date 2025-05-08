@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AIcodejs Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8f9fa;
+      color: #333;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 20px;
+      background: #343a40;
+      color: white;
+    }
+
+    .logo {
+      height: 40px;
+    }
+
+    .titles h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .titles p {
+      margin: 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    .burger {
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      background: #495057;
+      color: white;
+      padding: 10px 20px;
+    }
+
+    .menu a {
+      color: white;
+      text-decoration: none;
+      margin: 5px 0;
+    }
+
+    .menu.hidden {
+      display: none;
+    }
+
+    .features {
+      text-align: center;
+      padding: 30px 20px;
+      animation: fadeIn 1s ease;
+    }
+
+    .features button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .start-btn {
+      background-color: #0047ab;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: block;
+      margin: 20px auto;
+    }
+
+    .start-btn:hover {
+      background-color: #002f6c;
+    }
+
+    .animated-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 40px 20px;
+      gap: 30px;
+    }
+
+    .feature-box {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      width: 280px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: slideUp 0.8s ease;
+    }
+
+    .feature-box:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .feature-box h3 {
+      margin-bottom: 10px;
+      color: #007bff;
+    }
+
+    .feature-box p {
+      font-size: 15px;
+    }
+
+    footer {
+      background: #212529;
+      color: white;
+      text-align: center;
+      padding: 20px 10px;
+      font-size: 14px;
+    }
+
+    footer a {
+      color: #61dafb;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 600px) {
+      .feature-box {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <img src="iconri.png" alt="AIcodejs Logo" class="logo">
+    <div class="titles">
+      <h1>JS2PY</h1>
+      <p>Convert JavaScript to Python</p>
+    </div>
+    <div class="burger" onclick="toggleMenu()">☰</div>
+  </div>
+
+  <div id="menu" class="menu hidden">
+    <a href="main.html">JS2PY</a>
+  </div>
+
+  <div class="features">
+    <h2>Welcome, <span id="username"></span>!</h2>
+    <p>You are now accessing JS2PY FOR lifetime to convert javascript to python.</p>
+    <button onclick="deleteAccount()">Delete Account</button>
+  </div>
+
+  <button class="start-btn" onclick="window.location.href='main.html'">Start Converter</button>
+
+  <!-- New 3 Features Section -->
+  <div class="animated-section">
+    <div class="feature-box">
+      <h3>Live Code Preview</h3>
+      <p>See real-time output as your JavaScript is converted to Python. Perfect for learning and debugging.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>Save & Export</h3>
+      <p>Download your converted code instantly or save it to your device for future use.</p>
+    </div>
+
+    <div class="feature-box">
+      <h3>Smart Suggestions</h3>
+      <p>Get intelligent suggestions to improve or restructure your JavaScript before converting.</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 AIcodejs | 
+    <a href="mailto:support@aicodejs.com">Contact</a> |
+    <a href="t&c.html">Terms</a> |
+    <a href="privacypolicy.html">Privacy</a>
+  </footer>
+
+  <script>
+    const isLoggedIn = localStorage.getItem("user_logged_in");
+    const username = localStorage.getItem("username");
+
+    if (isLoggedIn !== "true" || !username) {
+      window.location.href = "pay.html";
+    } else {
+      document.getElementById("username").textContent = username;
+    }
+
+    function deleteAccount() {
+      if (confirm("Are you sure you want to delete your account?")) {
+        localStorage.clear();
+        alert("Account deleted.");
+        window.location.href = "pay.html";
+      }
+    }
+
+    function toggleMenu() {
+      document.getElementById("menu").classList.toggle("hidden");
+    }
+  </script>
+
+</body>
+</html>
