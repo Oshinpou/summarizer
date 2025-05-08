@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>中文段落摘要生成器</title>
+  <style>
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 960px;
+      width: 90%;
+      padding: 30px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      font-size: 16px;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+    .buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      padding: 10px 18px;
+      font-size: 15px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2c80b4;
+    }
+    #output {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f0f0f0;
+      min-height: 100px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>中文段落摘要生成器</h2>
+    <textarea id="inputText" placeholder="请输入一段中文文本..."></textarea>
+    <div class="buttons">
+      <button onclick="summarize()">生成摘要</button>
+      <button onclick="copyOutput()">复制摘要</button>
+      <button onclick="clearInput()">清除输入</button>
+      <button onclick="clearOutput()">清除输出</button>
+    </div>
+    <div id="output" placeholder="输出将在此处显示..."></div>
+  </div>
+
+  <script>
+    function getWordFreq(text) {
+      const freq = {};
+      const words = text.replace(/[^\u4e00-\u9fa5]/g, '').split('');
+      for (const word of words) {
+        if (!freq[word]) freq[word] = 0;
+        freq[word]++;
+      }
+      return freq;
+    }
+
+    function scoreSentences(sentences, wordFreq) {
+      const scores = [];
+      for (const sentence of sentences) {
+        let score = 0;
+        const words = sentence.replace(/[^\u4e00-\u9fa5]/g, '').split('');
+        for (const word of words) {
+          if (wordFreq[word]) score += wordFreq[word];
+        }
+        scores.push({ sentence, score });
+      }
+      return scores;
+    }
+
+    function summarize() {
+      const text = document.getElementById("inputText").value.trim();
+      if (!text) {
+        document.getElementById("output").innerText = "请输入一段文本以生成摘要。";
+        return;
+      }
+
+      const sentences = text.match(/[^。！？!?]+[。！？!?]/g) || [text];
+      const wordFreq = getWordFreq(text);
+      const scored = scoreSentences(sentences, wordFreq);
+      scored.sort((a, b) => b.score - a.score);
+
+      const topSentences = scored.slice(0, Math.ceil(sentences.length / 3));
+      const summary = topSentences.map(s => s.sentence.trim()).join('');
+      document.getElementById("output").innerText = summary;
+    }
+
+    function copyOutput() {
+      const summary = document.getElementById("output").innerText;
+      if (!summary) return;
+      navigator.clipboard.writeText(summary).then(() => {
+        alert("摘要已复制！");
+      });
+    }
+
+    function clearInput() {
+      document.getElementById("inputText").value = "";
+    }
+
+    function clearOutput() {
+      document.getElementById("output").innerText = "";
+    }
+  </script>
+</body>
+</html>
