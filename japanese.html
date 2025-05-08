@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>日本語要約ツール</title>
+  <style>
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 960px;
+      width: 95%;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+    }
+    #output {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f7f7f7;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      min-height: 100px;
+      white-space: pre-wrap;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 15px;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 18px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>日本語段落の要約ツール</h2>
+    <textarea id="inputText" placeholder="ここに日本語の段落を入力してください..."></textarea>
+    <div class="buttons">
+      <button onclick="summarize()">要約する</button>
+      <button onclick="copyOutput()">コピー</button>
+      <button onclick="clearInput()">入力をクリア</button>
+      <button onclick="clearOutput()">出力をクリア</button>
+    </div>
+    <div id="output" placeholder="ここに要約が表示されます。"></div>
+  </div>
+
+  <script>
+    function getCharFreq(text) {
+      const freq = {};
+      const chars = text.replace(/[^\u3040-\u30FF\u4E00-\u9FAF]/g, '').split('');
+      for (const c of chars) {
+        freq[c] = (freq[c] || 0) + 1;
+      }
+      return freq;
+    }
+
+    function scoreSentences(sentences, freq) {
+      return sentences.map(sentence => {
+        const chars = sentence.replace(/[^\u3040-\u30FF\u4E00-\u9FAF]/g, '').split('');
+        const score = chars.reduce((sum, char) => sum + (freq[char] || 0), 0);
+        return { sentence, score };
+      });
+    }
+
+    function summarize() {
+      const text = document.getElementById("inputText").value.trim();
+      if (!text) {
+        document.getElementById("output").innerText = "日本語の段落を入力してください。";
+        return;
+      }
+
+      const sentences = text.match(/[^。！？!?]+[。！？!?]/g) || [text];
+      const freq = getCharFreq(text);
+      const scored = scoreSentences(sentences, freq);
+      scored.sort((a, b) => b.score - a.score);
+      const top = scored.slice(0, Math.ceil(sentences.length / 3));
+      const summary = top.map(s => s.sentence.trim()).join('');
+      document.getElementById("output").innerText = summary;
+    }
+
+    function copyOutput() {
+      const text = document.getElementById("output").innerText;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("要約がコピーされました。");
+      });
+    }
+
+    function clearInput() {
+      document.getElementById("inputText").value = "";
+    }
+
+    function clearOutput() {
+      document.getElementById("output").innerText = "";
+    }
+  </script>
+</body>
+</html>
